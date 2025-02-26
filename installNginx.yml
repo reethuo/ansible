@@ -1,0 +1,26 @@
+---
+- name: Install and configure nginx on CentOS
+  hosts: centos_vms
+  become: true
+
+  tasks:
+    - name: Install Nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: Allow HTTP and HTTPS traffic in firewall
+      firewalld:
+        service: "{{ item }}"
+        permanent: true
+        state: enabled
+      loop:
+        - http
+        - https
+      notify:
+        - Reload firewall
+
+  handlers:
+    - name: Reload firewall
+      firewalld:
+        state: reloaded
